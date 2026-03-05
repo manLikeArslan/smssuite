@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model List {
+  id        String    @id @default(cuid())
+  name      String
+  isActive  Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  contacts  Contact[]
+}
+
+model Contact {
+  id          String   @id @default(cuid())
+  phone       String
+  status      String?
+  step        Int      @default(0)
+  lastSent    String?
+  blacklisted String?
+  list        List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  listId      String
+}
+
+model Stats {
+  id           Int @id @default(1)
+  totalSent    Int @default(0)
+  coldOutreach Int @default(0)
+  followUps    Int @default(0)
+  errors       Int @default(0)
+}

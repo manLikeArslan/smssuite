@@ -1,26 +1,49 @@
 {
-  "name": "smssuite-web",
-  "version": "0.1.0",
-  "private": true,
+  "name": "smssuite",
+  "version": "1.0.0",
+  "description": "Self-hosted SMS campaign manager built with Next.js, Prisma, and Pushcut webhooks",
+  "license": "MIT",
+  "author": "manLikeArslan",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/manLikeArslan/smssuite.git"
+  },
+  "keywords": [
+    "sms",
+    "campaign",
+    "nextjs",
+    "prisma",
+    "pushcut"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@prisma/client": "^6.2.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.35.0",
+    "lucide-react": "^0.577.0",
     "next": "16.1.6",
+    "papaparse": "^5.5.3",
+    "prisma": "^6.2.1",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^20.19.35",
+    "@types/papaparse": "^5.5.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }

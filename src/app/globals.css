@@ -1,26 +1,109 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
+@theme {
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  /* Minimal Palette */
+  --color-soft-black: #0a0a0a;
+  --color-soft-gray: #1a1a1a;
+  --color-soft-white: #f5f5f5;
+  --color-accent-blue: #3b82f6;
+
+  --radius-lg: 12px;
+  --radius-md: 8px;
+  --radius-sm: 4px;
+
+  --font-sans: var(--font-host-grotesk), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #faf0ca;
+    --foreground: #0d3b66;
+    --card: #fdf6df;
+    --card-foreground: #0d3b66;
+    --popover: #fdf6df;
+    --popover-foreground: #0d3b66;
+    --primary: #0d3b66;
+    --primary-foreground: #faf0ca;
+    --secondary: #f4d35e;
+    --secondary-foreground: #0d3b66;
+    --muted: #f4ebcc;
+    --muted-foreground: #5e6b7d;
+    --accent: #f4d35e;
+    --accent-foreground: #0d3b66;
+    --destructive: #92140c;
+    --destructive-foreground: #faf0ca;
+    --border: #e6dcb5;
+    --input: #fdf6df;
+    --ring: #0d3b66;
+    --radius: 12px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-bold tracking-tight text-foreground;
+  }
+}
+
+/* Minimal Utilities */
+.simple-card {
+  @apply bg-card border border-border rounded-xl p-6 shadow-sm;
+}
+
+.simple-input {
+  @apply bg-input border border-border text-foreground px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-muted-foreground;
+}
+
+.simple-label {
+  @apply text-sm font-medium text-muted-foreground mb-1.5 block;
+}
+
+.simple-button {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all px-4 py-2;
+}
+
+/* Scrollbar Management */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-background;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/30 transition-colors;
 }

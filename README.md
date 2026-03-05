@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SMS Suite
+
+A self-hosted SMS campaign manager built with Next.js. Upload contact lists, run cold outreach and follow-up sequences, and track delivery — all from a clean, mobile-friendly dashboard.
+
+SMS sending is powered by [Pushcut](https://www.pushcut.io/) webhooks, which trigger iOS Shortcuts to send messages natively from your iPhone.
+
+## Features
+
+- **List Management** — Upload CSV files, view per-list stats (Sent / Follow-ups / Remaining), delete lists
+- **Campaign Runner** — Start cold outreach or follow-up sessions with configurable targets, random delays, and a real-time progress log
+- **Simulation Mode** — Dry-run campaigns without sending real messages
+- **Session Persistence** — Campaign progress is saved to localStorage so you can resume after a page reload
+- **Password Protection** — Simple single-user auth via environment variable
+- **SQLite Database** — Zero-config storage using Prisma + SQLite
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript |
+| Database | SQLite via Prisma |
+| Styling | Tailwind CSS v4 |
+| Animations | Framer Motion |
+| Icons | Lucide React |
+| SMS Delivery | Pushcut Webhooks → iOS Shortcuts |
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- npm (or pnpm / yarn)
+- An iPhone with [Pushcut](https://www.pushcut.io/) installed (for actual SMS sending)
+
+### Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/manLikeArslan/smssuite.git
+cd smssuite
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your password and Pushcut webhook URL
+
+# Initialize the database
+npx prisma db push
+
+# Start the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) and log in with the password you set in `.env`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `DATABASE_URL` | SQLite database path | Yes |
+| `APP_PASSWORD` | Login password | Yes |
+| `PUSHCUT_WEBHOOK_URL` | Pushcut webhook endpoint for SMS delivery | For sending |
 
-## Learn More
+## Usage
 
-To learn more about Next.js, take a look at the following resources:
+1. **Upload a list** — Go to Lists → Upload a CSV with a `phone` column
+2. **Select the active list** — Click "Select List" on the list you want to use
+3. **Start a session** — Go to Send, choose "New Contact" or "Follow-up", set the target count, and hit Start
+4. **Monitor progress** — Watch the real-time log with delivery status and wait countdowns
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── app/
+│   ├── api/           # API routes (auth, campaign, lists)
+│   ├── campaign/      # Campaign runner page
+│   ├── lists/         # List management + upload pages
+│   ├── login/         # Login page
+│   ├── globals.css    # Design system
+│   ├── layout.tsx     # Root layout
+│   └── page.tsx       # Dashboard
+├── components/ui/     # Reusable UI components
+├── lib/               # Prisma client & utilities
+└── middleware.ts       # Auth middleware
+```
 
-## Deploy on Vercel
+## License
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+[MIT](LICENSE)
