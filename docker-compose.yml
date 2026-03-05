@@ -1,0 +1,16 @@
+services:
+  smssuite:
+    build: .
+    container_name: smssuite
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=file:/app/data/smssuite.db
+      - APP_PASSWORD=${APP_PASSWORD:-admin}
+      - PUSHCUT_WEBHOOK_URL=${PUSHCUT_WEBHOOK_URL:-}
+    volumes:
+      - smssuite-data:/app/data
+
+volumes:
+  smssuite-data:

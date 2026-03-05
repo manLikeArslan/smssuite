@@ -56,6 +56,21 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) and log in with the password you set in `.env`.
 
+### Docker
+
+```bash
+# Clone and configure
+git clone https://github.com/manLikeArslan/smssuite.git
+cd smssuite
+cp .env.example .env
+# Edit .env with your credentials
+
+# Build and run
+docker compose up -d
+```
+
+The app will be available at [http://localhost:3000](http://localhost:3000). Data is persisted in a Docker volume.
+
 ### Environment Variables
 
 | Variable | Description | Required |
