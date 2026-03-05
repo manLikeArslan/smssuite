@@ -56,21 +56,62 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) and log in with the password you set in `.env`.
 
-### Docker
+### Docker (VPS Deployment)
+
+Deploy on any VPS (DigitalOcean, Hetzner, AWS, etc.) in under 5 minutes:
 
 ```bash
-# Clone and configure
+# 1. SSH into your server
+ssh root@your-server-ip
+
+# 2. Install Docker (skip if already installed)
+curl -fsSL https://get.docker.com | sh
+
+# 3. Clone the repo
 git clone https://github.com/manLikeArslan/smssuite.git
 cd smssuite
-cp .env.example .env
-# Edit .env with your credentials
 
-# Build and run
+# 4. Configure environment
+cp .env.example .env
+nano .env   # Set your APP_PASSWORD and PUSHCUT_WEBHOOK_URL
+
+# 5. Launch
 docker compose up -d
 ```
 
-The app will be available at [http://localhost:3000](http://localhost:3000). Data is persisted in a Docker volume.
+The app is now running at `http://your-server-ip:3000`.
 
+#### Reverse Proxy with Nginx (optional, for custom domain + SSL)
+
+```bash
+# Install Nginx and Certbot
+apt install nginx certbot python3-certbot-nginx -y
+```
+
+Create `/etc/nginx/sites-available/smssuite`:
+
+```nginx
+server {
+    server_name yourdomain.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+```bash
+# Enable the site and get SSL
+ln -s /etc/nginx/sites-available/smssuite /etc/nginx/sites-enabled/
+certbot --nginx -d yourdomain.com
+systemctl restart nginx
+```
+
+Your app is now live at `https://yourdomain.com` with automatic HTTPS.
 ### Environment Variables
 
 | Variable | Description | Required |
