@@ -133,7 +133,9 @@ export default function CampaignPage() {
 
         while (count < limit && runningRef.current) {
             try {
-                const res = await fetch(`/api/campaign/targets?mode=${mode}&skip=${count}&take=${BATCH_SIZE}`);
+                // We don't use skip=count here because the API query filters out already processed targets.
+                // Using skip=count would skip the next uncontacted targets.
+                const res = await fetch(`/api/campaign/targets?mode=${mode}&skip=0&take=${BATCH_SIZE}`);
                 if (!res.ok) throw new Error("Batch fetch failed");
                 const data = await res.json();
                 const currentBatch = data.targets || [];
@@ -256,7 +258,7 @@ export default function CampaignPage() {
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-sm font-semibold">Test Mode</span>
-                                        <span className="text-xs text-muted-foreground">Don't send real texts</span>
+                                        <span className="text-xs text-muted-foreground">Don&apos;t send real texts</span>
                                     </div>
                                 </div>
                                 <button

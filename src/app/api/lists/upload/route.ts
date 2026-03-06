@@ -15,17 +15,19 @@ export async function POST(req: Request) {
         }
 
         const sample = contacts[0];
-        const phoneKey = Object.keys(sample).find(k => k.toLowerCase() === 'phone' || k.toLowerCase().includes('number'));
+        const phoneKey = Object.keys(sample).find(k =>
+            ['phone', 'number', 'mobile'].some(pk => k.toLowerCase().includes(pk))
+        );
 
         if (!phoneKey) {
-            return NextResponse.json({ error: "No 'phone' column found in CSV. Expected header 'phone'." }, { status: 400 });
+            return NextResponse.json({ error: "No 'phone', 'number', or 'mobile' column found in CSV." }, { status: 400 });
         }
 
         const listCount = await prisma.list.count();
         const isActive = listCount === 0;
 
         // Perform in a transaction for atomicity
-        const result = await prisma.$transaction(async (tx: any) => {
+        const result = await prisma.$transaction(async (tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0]) => {
             const list = await tx.list.create({
                 data: {
                     name,
@@ -33,7 +35,7 @@ export async function POST(req: Request) {
                 }
             });
 
-            const contactsToCreate = contacts.map((c: Record<string, any>) => {
+            const contactsToCreate = contacts.map((c: Record<string, unknown>) => {
                 // Find keys case-insensitively
                 const getVal = (possibleKeys: string[]) => {
                     const key = Object.keys(c).find(k =>
@@ -78,11 +80,11 @@ export async function POST(req: Request) {
         });
 
         return NextResponse.json(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("BATCH_UPLOAD_ERROR:", error);
         return NextResponse.json({
             error: "Injection failed",
-            details: error?.message || "Internal Server Error"
+            details: error instanceof Error ? error.message : "Internal Server Error"
         }, { status: 500 });
     }
 }

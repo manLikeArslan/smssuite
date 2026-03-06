@@ -1,0 +1,35 @@
+
+> smssuite@1.0.0 dev
+> next dev
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+- Environments: .env
+
+✓ Starting...
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+✓ Ready in 1458ms
+ GET /login 200 in 840ms (compile: 417ms, proxy.ts: 5ms, render: 418ms)
+ POST /api/auth 200 in 141ms (compile: 104ms, proxy.ts: 10ms, render: 27ms)
+ GET / 200 in 81ms (compile: 39ms, proxy.ts: 7ms, render: 35ms)
+ GET / 200 in 50ms (compile: 8ms, proxy.ts: 11ms, render: 31ms)
+ GET /api/stats 200 in 121ms (compile: 77ms, proxy.ts: 8ms, render: 37ms)
+ GET /api/stats 200 in 26ms (compile: 13ms, proxy.ts: 5ms, render: 7ms)
+ GET /login 200 in 102ms (compile: 8ms, proxy.ts: 6ms, render: 88ms)
+ POST /api/auth 200 in 20ms (compile: 4ms, proxy.ts: 8ms, render: 8ms)
+ GET / 200 in 33ms (compile: 6ms, proxy.ts: 4ms, render: 23ms)
+ GET / 200 in 69ms (compile: 7ms, proxy.ts: 4ms, render: 58ms)
+ GET /api/stats 200 in 18ms (compile: 4ms, proxy.ts: 6ms, render: 8ms)
+ GET /api/stats 200 in 14ms (compile: 3ms, proxy.ts: 4ms, render: 7ms)
+ GET /login 200 in 123ms (compile: 7ms, proxy.ts: 4ms, render: 111ms)
+ POST /api/auth 200 in 15ms (compile: 4ms, proxy.ts: 5ms, render: 6ms)
+ GET / 200 in 30ms (compile: 5ms, proxy.ts: 4ms, render: 21ms)
+ GET / 200 in 49ms (compile: 7ms, proxy.ts: 7ms, render: 34ms)
+ GET /api/stats 200 in 35ms (compile: 19ms, proxy.ts: 5ms, render: 11ms)
+ GET /api/stats 200 in 139ms (compile: 3ms, proxy.ts: 4ms, render: 132ms)
+ GET /lists/upload 200 in 245ms (compile: 102ms, proxy.ts: 14ms, render: 130ms)
+ POST /api/lists/upload 200 in 75ms (compile: 44ms, proxy.ts: 5ms, render: 26ms)
+ GET /lists 200 in 1383ms (compile: 1353ms, proxy.ts: 3ms, render: 27ms)
+ GET /api/lists 200 in 243ms (compile: 225ms, proxy.ts: 5ms, render: 12ms)
+ GET /api/lists 200 in 15ms (compile: 3ms, proxy.ts: 4ms, render: 8ms)
