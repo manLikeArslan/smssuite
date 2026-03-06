@@ -1,0 +1,27 @@
+
+> smssuite@1.0.0 dev
+> next dev
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+- Environments: .env
+
+✓ Starting...
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+✓ Ready in 2.8s
+ GET /login 200 in 2.5s (compile: 1973ms, proxy.ts: 18ms, render: 464ms)
+ POST /api/auth 200 in 405ms (compile: 335ms, proxy.ts: 17ms, render: 53ms)
+ GET / 200 in 376ms (compile: 274ms, proxy.ts: 23ms, render: 79ms)
+ GET / 200 in 230ms (compile: 46ms, proxy.ts: 17ms, render: 168ms)
+ GET /api/stats 200 in 503ms (compile: 374ms, proxy.ts: 29ms, render: 100ms)
+ GET /api/stats 200 in 124ms (compile: 95ms, proxy.ts: 17ms, render: 11ms)
+ GET /campaign 200 in 2.1s (compile: 1914ms, proxy.ts: 36ms, render: 117ms)
+ GET /api/campaign/session 200 in 322ms (compile: 293ms, proxy.ts: 17ms, render: 12ms)
+ GET /api/campaign/targets?mode=cold&countOnly=true 200 in 316ms (compile: 241ms, proxy.ts: 14ms, render: 61ms)
+ POST /api/campaign/session 200 in 30ms (compile: 4ms, proxy.ts: 5ms, render: 20ms)
+ GET /api/campaign/session 200 in 20ms (compile: 5ms, proxy.ts: 4ms, render: 11ms)
+ GET /api/campaign/session 200 in 26ms (compile: 14ms, proxy.ts: 4ms, render: 8ms)
+ POST /api/campaign/session/pause 200 in 233ms (compile: 196ms, proxy.ts: 9ms, render: 28ms)
+ GET /api/campaign/session 200 in 19ms (compile: 4ms, proxy.ts: 5ms, render: 10ms)
+ GET /api/campaign/session 200 in 17ms (compile: 4ms, proxy.ts: 4ms, render: 9ms)

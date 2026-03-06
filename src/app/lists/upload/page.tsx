@@ -64,7 +64,7 @@ export default function UploadPage() {
         }
     };
 
-    const submitData = async (contacts: any[]) => {
+    const submitData = async (contacts: { phone: string; [key: string]: string | number | null }[]) => {
         try {
             const res = await fetch("/api/lists/upload", {
                 method: "POST",

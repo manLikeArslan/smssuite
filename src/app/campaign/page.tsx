@@ -30,34 +30,7 @@ export default function CampaignPage() {
 
     const [loadingConfig, setLoadingConfig] = useState(false);
 
-    // Ref to hold running state for the async loop
-    const runningRef = useRef(false);
     const logsEndRef = useRef<HTMLDivElement>(null);
-
-    // Persistence Loading
-    useEffect(() => {
-        const saved = localStorage.getItem(PERSIST_KEY);
-        if (saved) {
-            try {
-                const state = JSON.parse(saved);
-                setMode(state.mode || "cold");
-                setIsDryRun(!!state.isDryRun);
-                setLimit(state.limit || 0);
-                setProgress(state.progress || 0);
-                setCurrentCount(state.currentCount || 0);
-                setLogs(state.logs || []);
-                // We don't auto-resume isRunning for safety, but state is ready
-            } catch (e) {
-                console.error("Failed to restore campaign state", e);
-            }
-        }
-    }, []);
-
-    // Persistence Saving
-    useEffect(() => {
-        const state = { mode, isDryRun, limit, progress, currentCount, logs };
-        localStorage.setItem(PERSIST_KEY, JSON.stringify(state));
-    }, [mode, isDryRun, limit, progress, currentCount, logs]);
 
     const addLog = (message: string, type: LogEntry['type'] = "info", duration?: number) => {
         setLogs(prev => [...prev.slice(-99), {
@@ -99,14 +72,57 @@ export default function CampaignPage() {
         }
     };
 
+    const fetchSessionState = async () => {
+        try {
+            const res = await fetch("/api/campaign/session");
+            const data = await res.json();
+
+            if (data.session) {
+                const session = data.session;
+
+                // Only overwrite user form controls if a session is actively running or paused.
+                // Otherwise let them configure a new one.
+                if (session.status === "running" || session.status === "paused") {
+                    setMode(session.mode);
+                    setIsDryRun(session.isDryRun);
+                    setLimit(session.totalTargets);
+                }
+
+                setCurrentCount(session.processedCount);
+                setIsRunning(session.status === "running");
+
+                if (session.totalTargets > 0) {
+                    setProgress((session.processedCount / session.totalTargets) * 100);
+                }
+
+                if (session.logs) {
+                    setLogs(session.logs);
+                }
+            } else {
+                // No session at all
+                setIsRunning(false);
+            }
+        } catch (e) {
+            console.error("Failed to fetch session state", e);
+        }
+    };
+
     useEffect(() => {
-        if (!isRunning) {
+        fetchSessionState();
+
+        // Poll every 2 seconds
+        const interval = setInterval(() => {
+            fetchSessionState();
+        }, 2000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
+        if (!isRunning && currentCount === 0) {
             fetchTargetsCount();
         }
-    }, [mode]);
-
-    const getRandomDelay = () => Math.floor(Math.random() * (25 - 15 + 1) + 15) * 1000;
-    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+    }, [mode, isRunning, currentCount]);
 
     const startCampaign = async (isResuming = false) => {
         if (limit <= 0) {
@@ -114,100 +130,46 @@ export default function CampaignPage() {
             return;
         }
 
-        setIsRunning(true);
-        runningRef.current = true;
+        try {
+            if (isResuming) {
+                const res = await fetch("/api/campaign/session/resume", { method: "POST" });
+                if (!res.ok) throw new Error("Failed to resume");
+            } else {
+                const res = await fetch("/api/campaign/session", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ mode, isDryRun, limit })
+                });
+                if (!res.ok) throw new Error("Failed to start session");
+            }
 
-        if (!isResuming) {
+            fetchSessionState(); // immediate update
+        } catch (e) {
+            console.error(e);
+            addLog("Failed to reach server to start session.", "error");
+        }
+    };
+
+    const stopCampaign = async () => {
+        try {
+            await fetch("/api/campaign/session/pause", { method: "POST" });
+            fetchSessionState();
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const clearSession = async () => {
+        if (!confirm("Stop current session and clear logs?")) return;
+        try {
+            await fetch("/api/campaign/session/stop", { method: "POST" });
             setProgress(0);
             setCurrentCount(0);
             setLogs([]);
-            addLog(`Started ${mode === 'cold' ? 'New Contact' : 'Follow-up'} session`, "info");
-        } else {
-            addLog(`Resuming session from ${currentCount}`, "info");
+            fetchTargetsCount();
+        } catch (e) {
+            console.error(e);
         }
-
-        if (isDryRun) addLog("Mode: Simulation Only (No texts sent)", "warning");
-
-        let count = isResuming ? currentCount : 0;
-        const BATCH_SIZE = 50;
-
-        while (count < limit && runningRef.current) {
-            try {
-                const res = await fetch(`/api/campaign/targets?mode=${mode}&skip=${count}&take=${BATCH_SIZE}`);
-                if (!res.ok) throw new Error("Batch fetch failed");
-                const data = await res.json();
-                const currentBatch = data.targets || [];
-
-                if (currentBatch.length === 0) break;
-
-                for (let i = 0; i < currentBatch.length && count < limit; i++) {
-                    if (!runningRef.current) break;
-
-                    const target = currentBatch[i];
-                    const phone = String(target.phone);
-                    const delayMs = getRandomDelay();
-
-                    if (isDryRun) {
-                        addLog(`Simulation: ${phone}`, "info");
-                    } else {
-                        try {
-                            const sendRes = await fetch("/api/campaign/send", {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({
-                                    contactId: target.id,
-                                    phone: phone,
-                                    mode,
-                                    isDryRun: false
-                                })
-                            });
-
-                            if (sendRes.ok) {
-                                addLog(`Sent to ${phone}`, "success");
-                            } else {
-                                addLog(`Failed for ${phone}`, "error");
-                            }
-                        } catch (e) {
-                            addLog(`Network error for ${phone}`, "error");
-                        }
-                    }
-
-                    count++;
-                    const newProgress = (count / limit) * 100;
-                    setProgress(newProgress);
-                    setCurrentCount(count);
-
-                    if (count < limit && runningRef.current) {
-                        const seconds = Math.floor(delayMs / 1000);
-                        addLog(`Waiting ${seconds}s...`, "info", delayMs);
-                        await sleep(delayMs);
-                    }
-                }
-            } catch (e) {
-                addLog("Stopped due to error.", "error");
-                break;
-            }
-        }
-
-        setIsRunning(false);
-        runningRef.current = false;
-        if (count >= limit || !runningRef.current) {
-            addLog(`Session finished: ${count} completed`, "success");
-        }
-    };
-
-    const stopCampaign = () => {
-        runningRef.current = false;
-        addLog("Manual stop requested", "warning");
-    };
-
-    const clearSession = () => {
-        if (!confirm("Clear current session state and logs?")) return;
-        localStorage.removeItem(PERSIST_KEY);
-        setProgress(0);
-        setCurrentCount(0);
-        setLogs([]);
-        setLimit(maxAvailable);
     };
 
     return (
@@ -256,7 +218,7 @@ export default function CampaignPage() {
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-sm font-semibold">Test Mode</span>
-                                        <span className="text-xs text-muted-foreground">Don't send real texts</span>
+                                        <span className="text-xs text-muted-foreground">Don&apos;t send real texts</span>
                                     </div>
                                 </div>
                                 <button

@@ -50,3 +50,4 @@ next-env.d.ts
 # AI workspace
 .agent/
 .gemini/
+npm_dev.log
