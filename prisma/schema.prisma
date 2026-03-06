@@ -13,6 +13,7 @@ model List {
   isActive  Boolean   @default(false)
   createdAt DateTime  @default(now())
   contacts  Contact[]
+  sessions  CampaignSession[]
 }
 
 model Contact {
@@ -32,4 +33,30 @@ model Stats {
   coldOutreach Int @default(0)
   followUps    Int @default(0)
   errors       Int @default(0)
+}
+
+model CampaignSession {
+  id             String        @id @default(cuid())
+  mode           String        // "cold" or "followup"
+  status         String        @default("running") // "running", "paused", "completed", "error"
+  totalTargets   Int           @default(0)
+  processedCount Int           @default(0)
+  isDryRun       Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  listId         String
+  list           List          @relation(fields: [listId], references: [id], onDelete: Cascade)
+  logs           CampaignLog[]
+}
+
+model CampaignLog {
+  id         String          @id @default(cuid())
+  sessionId  String
+  session    CampaignSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  time       String
+  message    String
+  type       String          @default("info") // "info", "success", "error", "warning"
+  duration   Int?            // Optional duration for progress bar in ms
+  createdAt  DateTime        @default(now())
 }
